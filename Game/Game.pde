@@ -1,11 +1,11 @@
-PImage img;
+Player player;
 
 void setup() {
   size(400, 400);
-  img = loadImage("character/character.png");
+  player = new Player();
 }
 
 void draw() {
-  background(0);
-  image(img, 0, 0);
+  background(255);
+  player.advance();
 }
