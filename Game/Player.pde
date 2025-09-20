@@ -14,4 +14,9 @@ class Player {
     y += vel_y;
     image(img, x, y);
   }
+  
+  void changeState(boolean isRight) {
+    vel_x = 3;
+    if (!isRight) vel_x *= -1;
+  }
 }
