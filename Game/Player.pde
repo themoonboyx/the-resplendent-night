@@ -1,35 +1,47 @@
 class Player {
-  PImage img;
-  boolean isRight = true;
-  State state = State.IDLE;
-  float x = 0;
-  float y = 400-96;
-  float vel_x = 0;
-  float vel_y = 0;
+  private PImage img;
+  private boolean isRight = true;
+  private State state = State.IDLE;
+  private float x = 0;
+  private float y = 400-96;
+  private float vel_x = 0;
+  private float vel_y = 0;
   
   Player() {
     img = loadImage("character/character.png");
   }
   
-  void advance() {
-    x += vel_x;
+  public void advance() {
+    x += isRight ? vel_x : -vel_x;
     if (state == State.JUMP) {
-      vel_y += 0.1;
-      y += vel_y;
+      if (y + 96 >= height && vel_y > 0) {
+        if (vel_x == 0) changeState(State.IDLE);
+        else changeState(State.RUN);
+      } else {
+        vel_y += 0.1;
+        y += vel_y;
+      }
     }
     image(img, x, y);
   }
   
-  void changeState(State newState) {
+  public State getState() {return state;}
+  
+  public void changeVelX(float vx) {changeVelX(vx, isRight);}
+  
+  public void changeVelX(float vx, boolean right) {
+    vel_x = vx;
+    isRight = right;
+  }
+  
+  public void changeState(State newState) {
     changeState(newState, isRight);
   }
   
-  void changeState(State newState, boolean right) {
+  public void changeState(State newState, boolean right) {
     isRight = right;
-    if (state == State.JUMP) return;
-    vel_x = newState.getVelX();
+    if (!Float.isNaN(newState.getVelX())) vel_x = newState.getVelX();
     vel_y = newState.getVelY();
-    if (!isRight) vel_x *= -1;
     state = newState;
   }
 }

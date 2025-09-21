@@ -1,8 +1,9 @@
 Player player;
-HashMap<String, Boolean> isKeyPressed = new HashMap<>();
+HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 
+// states that the player can be in
 enum State {
-  IDLE(0, 0), RUN(3, 0), JUMP(0, -3);
+  IDLE(0, 0), RUN(3, 0), JUMP(Float.NaN, -3);
   
   private float vel_x;
   private float vel_y;
@@ -19,30 +20,41 @@ enum State {
 void setup() {
   size(400, 400);
   player = new Player();
+  
+  // add initial values to avoid glitches
   isKeyPressed.put("a", false);
   isKeyPressed.put("d", false);
   isKeyPressed.put("w", false);
+  
+  frameRate(60);
 }
 
 void draw() {
   background(100);
-  player.advance();
+  player.advance(); // draw and move the player
 }
 
+// movement for player based on keyboard
 void keyPressed() {
   String keyS = key + "";
   keyS = keyS.toLowerCase();
   isKeyPressed.put(keyS, true);
-  switch(keyS) {
-    case "a":
-      player.changeState(State.RUN, false);
-      break;
-    case "d":
-      player.changeState(State.RUN, true);
-      break;
-    case "w":
-      player.changeState(State.JUMP);
-      break;
+  
+  if (player.getState() == State.JUMP) { // if the player is jumping, keep jumping, but can move left and right
+    if (keyS.equals("a")) player.changeVelX(State.RUN.getVelX(), false);
+    if (keyS.equals("d")) player.changeVelX(State.RUN.getVelX(), true);
+  } else {
+    switch(keyS) {
+      case "a":
+        player.changeState(State.RUN, false);
+        break;
+      case "d":
+        player.changeState(State.RUN, true);
+        break;
+      case "w":
+        player.changeState(State.JUMP);
+        break;
+    }
   }
 }
 
@@ -50,5 +62,10 @@ void keyReleased() {
   String keyS = key + "";
   keyS = keyS.toLowerCase();
   isKeyPressed.put(keyS, false);
-  if (!isKeyPressed.get("a") && !isKeyPressed.get("d")) player.changeState(State.IDLE);
+  
+  // if no left/right movement is being pressed, stop moving (horizontally)
+  if (!isKeyPressed.get("a") && !isKeyPressed.get("d")) {
+    if (player.getState() == State.JUMP) player.changeVelX(State.IDLE.getVelX());
+    else player.changeState(State.IDLE);
+  }
 }
