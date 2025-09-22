@@ -1,9 +1,12 @@
 Player player;
 HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
+PImage background;
+float camera_x = 0;
+float camera_y = 0;
 
 // states that the player can be in
 enum State {
-  IDLE(0, 0), RUN(3, 0), JUMP(Float.NaN, -3);
+  IDLE(0, 0), RUN(3, 0), JUMP(Float.NaN, -4);
   
   private float vel_x;
   private float vel_y;
@@ -18,8 +21,10 @@ enum State {
 }
 
 void setup() {
-  size(400, 400);
+  size(288, 288);
   player = new Player();
+  background = loadImage("background/background0.2.png");
+  imageMode(CENTER);
   
   // add initial values to avoid glitches
   isKeyPressed.put("a", false);
@@ -30,7 +35,13 @@ void setup() {
 }
 
 void draw() {
-  background(100);
+  if (player.getX()-camera_x > width*0.8) camera_x = player.getX()-width*0.8;
+  if (player.getX()-camera_x < width*0.2) camera_x = player.getX()-width*0.2;
+  
+  float bg_x = floor(camera_x/background.width)*background.width+width/2.0-camera_x;
+  image(background, bg_x, height/2.0);
+  image(background, bg_x + width, height/2.0);
+  
   player.advance(); // draw and move the player
 }
 
