@@ -6,17 +6,18 @@ float camera_y = 0;
 
 // states that the player can be in
 enum State {
-  IDLE(0, 0, "character"), RUN(3, 0, "character"), JUMP(Float.NaN, -12, "character");
+  IDLE(0, 0, "idle", 4), RUN(3, 0, "idle", 4), JUMP(Float.NaN, -12, "idle", 4);
   
   private float vel_x;
   private float vel_y;
   public String imgName;
-  public PImage img;
+  public PImage[] frames;
   
-  private State(float vel_x, float vel_y, String imgName) {
+  private State(float vel_x, float vel_y, String imgName, int frames) {
     this.vel_x = vel_x;
     this.vel_y = vel_y;
     this.imgName = "character/"+imgName+".png";
+    this.frames = new PImage[frames];
   }
   
   public float getVelX() {return vel_x;}
@@ -27,7 +28,10 @@ void setup() {
   size(576, 576, P2D);
   background = loadImage("background/background0.2.png");
   for (State s : State.values()) {
-    s.img = loadImage(s.imgName);
+    PImage img = loadImage(s.imgName);
+    for (int i = 0; i < s.frames.length; i++) {
+      s.frames[i] = img.get((i*img.width)/s.frames.length, 0, img.width/s.frames.length, img.height);
+    }
   }
   player = new Player();
   imageMode(CENTER);

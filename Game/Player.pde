@@ -1,5 +1,6 @@
 class Player {
   private boolean isRight = true;
+  private int frame = 0;
   private State state = State.IDLE;
   private float x;
   private float y;
@@ -8,13 +9,14 @@ class Player {
   
   Player() {
     x = width/2.0;
-    y = height-state.img.height/2.0;
+    y = height-state.frames[0].height/2.0;
   }
   
   public void advance() {
+    frame++;
     x += isRight ? vel_x : -vel_x;
     if (state == State.JUMP) {
-      if (y + state.img.height/2.0 >= height && vel_y > 0) {
+      if (y + state.frames[0].height/2.0 >= height && vel_y > 0) {
         if (vel_x == 0) changeState(State.IDLE);
         else changeState(State.RUN);
       } else {
@@ -22,11 +24,11 @@ class Player {
         y += vel_y;
       }
     }
-    if (isRight) image(state.img, x-camera_x, y);
+    if (isRight) image(state.frames[(frame/20)%state.frames.length], x-camera_x, y);
     else {
       pushMatrix();
       scale(-1, 1);
-      image(state.img, -x+camera_x, y);
+      image(state.frames[(frame/20)%state.frames.length], -x+camera_x, y);
       popMatrix();
     }
   }
