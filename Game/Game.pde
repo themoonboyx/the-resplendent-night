@@ -1,11 +1,12 @@
-Player player;
-HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
-PImage background;
-float camera_x = 0;
-float camera_y = 0;
+public Player player;
+public GoopEnemy e1;
+public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
+public PImage background;
+public float camera_x = 0;
+public float camera_y = 0;
 
 // states that the player can be in
-enum State {
+public enum State {
   IDLE(0, 0, "idle", 4), RUN(3, 0, "idle", 4), JUMP(Float.NaN, -12, "idle", 4);
   
   private float vel_x;
@@ -16,7 +17,7 @@ enum State {
   private State(float vel_x, float vel_y, String imgName, int frames) {
     this.vel_x = vel_x;
     this.vel_y = vel_y;
-    this.imgName = "character/"+imgName+".png";
+    this.imgName = imgName+".png";
     this.frames = new PImage[frames];
   }
   
@@ -24,16 +25,11 @@ enum State {
   public float getVelY() {return vel_y;}
 }
 
-void setup() {
+public void setup() {
   size(576, 576, P2D);
   background = loadImage("background/background0.2.png");
-  for (State s : State.values()) {
-    PImage img = loadImage(s.imgName);
-    for (int i = 0; i < s.frames.length; i++) {
-      s.frames[i] = img.get((i*img.width)/s.frames.length, 0, img.width/s.frames.length, img.height);
-    }
-  }
   player = new Player();
+  e1 = new GoopEnemy();
   imageMode(CENTER);
   
   // add initial values to avoid glitches
@@ -44,7 +40,7 @@ void setup() {
   frameRate(60);
 }
 
-void draw() {
+public void draw() {
   if (player.getX()-camera_x > width*0.8) camera_x = player.getX()-width*0.8;
   if (player.getX()-camera_x < width*0.2) camera_x = player.getX()-width*0.2;
   
@@ -53,10 +49,11 @@ void draw() {
   image(background, bg_x + background.width, height/2.0);
   
   player.advance(); // draw and move the player
+  e1.advance();
 }
 
 // movement for player based on keyboard
-void keyPressed() {
+public void keyPressed() {
   String keyS = key + "";
   keyS = keyS.toLowerCase();
   isKeyPressed.put(keyS, true);
@@ -79,7 +76,7 @@ void keyPressed() {
   }
 }
 
-void keyReleased() {
+public void keyReleased() {
   String keyS = key + "";
   keyS = keyS.toLowerCase();
   isKeyPressed.put(keyS, false);
