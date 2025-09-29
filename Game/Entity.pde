@@ -11,7 +11,7 @@ public abstract class Entity {
   public Entity(float x, String name, int size) {
     this.x = x;
     for (State s : getPossibleStates()) {
-      PImage img = loadImage(name+"/"+s.imgName);
+      PImage img = loadImage(name+"/"+s.getImgName());
       PImage[] frames = new PImage[img.width/size];
       for (int i = 0; i < frames.length; i++) {
         frames[i] = img.get(i*size, 0, size, img.height);
@@ -33,6 +33,11 @@ public abstract class Entity {
         y += vel_y;
       }
     }
+    for (Entity e : getPossibleCollisions()) {
+      if (checkCollision(e)) {
+        x -= isRight ? vel_x : -vel_x;
+      }
+    }
     if (isRight) image(getImg(), x-camera_x, y);
     else {
       pushMatrix();
@@ -42,21 +47,33 @@ public abstract class Entity {
     }
   }
   
-  private PImage getImg() {return framesMap.get(state)[(frame/20)%framesMap.get(state).length];}
+  public PImage getImg() {return framesMap.get(state)[(frame/20)%framesMap.get(state).length];}
   
   public float getX() {return x;}
+  public float getY() {return y;}
   
   public State getState() {return state;}
   
   public abstract float getRunVel();
   
   public abstract State[] getPossibleStates();
+  public abstract Entity[] getPossibleCollisions();
   
   public void stopVel() {vel_x = 0;}
   
   public void startVel(boolean right) {
     vel_x = getRunVel();
     isRight = right;
+  }
+  
+  public boolean checkCollision(Entity e) {
+    if ((x-getImg().width/2.0 < e.getX()+e.getImg().width/2.0) &&
+      (x+getImg().width/2.0 > e.getX()-e.getImg().width/2.0) &&
+      (y-getImg().height/2.0 < e.getY()+e.getImg().height/2.0) &&
+      (y+getImg().height/2.0 > e.getY()-e.getImg().height/2.0)) {
+      return true;
+    }
+    return false;
   }
   
   public void changeState(State newState) {

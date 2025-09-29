@@ -11,7 +11,7 @@ public enum State {
   IDLE(0, "idle"), RUN(0, "run"), JUMP(-12, "jump");
   
   private float vel_y;
-  public String imgName;
+  private String imgName;
   
   private State(float vel_y, String imgName) {
     this.vel_y = vel_y;
@@ -19,6 +19,7 @@ public enum State {
   }
   
   public float getVelY() {return vel_y;}
+  public String getImgName() {return imgName;}
 }
 
 public void setup() {
