@@ -7,21 +7,16 @@ public float camera_y = 0;
 
 // states that the player can be in
 public enum State {
-  IDLE(0, 0, "idle", 4), RUN(3, 0, "idle", 4), JUMP(Float.NaN, -12, "idle", 4);
+  IDLE(0, "idle"), RUN(0, "idle"), JUMP(-12, "idle");
   
-  private float vel_x;
   private float vel_y;
   public String imgName;
-  public PImage[] frames;
   
-  private State(float vel_x, float vel_y, String imgName, int frames) {
-    this.vel_x = vel_x;
+  private State(float vel_y, String imgName) {
     this.vel_y = vel_y;
     this.imgName = imgName+".png";
-    this.frames = new PImage[frames];
   }
   
-  public float getVelX() {return vel_x;}
   public float getVelY() {return vel_y;}
 }
 
@@ -59,8 +54,8 @@ public void keyPressed() {
   isKeyPressed.put(keyS, true);
   
   if (player.getState() == State.JUMP) { // if the player is jumping, keep jumping, but can move left and right
-    if (keyS.equals("a")) player.changeVelX(State.RUN.getVelX(), false);
-    if (keyS.equals("d")) player.changeVelX(State.RUN.getVelX(), true);
+    if (keyS.equals("a")) player.startVel(false);
+    if (keyS.equals("d")) player.startVel(true);
   } else {
     switch(keyS) {
       case "a":
@@ -83,11 +78,11 @@ public void keyReleased() {
   
   // if no left/right movement is being pressed, stop moving (horizontally)
   if (!isKeyPressed.get("a") && !isKeyPressed.get("d")) {
-    if (player.getState() == State.JUMP) player.changeVelX(State.IDLE.getVelX());
+    if (player.getState() == State.JUMP) player.stopVel();
     else player.changeState(State.IDLE);
   } else if (!isKeyPressed.get("a")) {
-    player.changeVelX(State.RUN.getVelX(), true);
+    player.startVel(true);
   } else if (!isKeyPressed.get("d")) {
-    player.changeVelX(State.RUN.getVelX(), false);
+    player.startVel(false);
   }
 }

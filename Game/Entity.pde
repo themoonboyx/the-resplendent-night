@@ -48,10 +48,12 @@ public abstract class Entity {
   
   public State getState() {return state;}
   
-  public void changeVelX(float vx) {changeVelX(vx, isRight);}
+  public abstract float getRunVel();
   
-  public void changeVelX(float vx, boolean right) {
-    vel_x = vx;
+  public void stopVel() {vel_x = 0;}
+  
+  public void startVel(boolean right) {
+    vel_x = getRunVel();
     isRight = right;
   }
   
@@ -61,7 +63,8 @@ public abstract class Entity {
   
   public void changeState(State newState, boolean right) {
     isRight = right;
-    if (!Float.isNaN(newState.getVelX())) vel_x = newState.getVelX();
+    if (newState == State.RUN) vel_x = getRunVel();
+    else if (newState == State.IDLE) stopVel();
     vel_y = newState.getVelY();
     state = newState;
   }
