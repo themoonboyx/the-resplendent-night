@@ -10,7 +10,7 @@ public abstract class Entity {
   
   public Entity(float x, String name, int size) {
     this.x = x;
-    for (State s : State.values()) {
+    for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.imgName);
       PImage[] frames = new PImage[img.width/size];
       for (int i = 0; i < frames.length; i++) {
@@ -49,6 +49,8 @@ public abstract class Entity {
   public State getState() {return state;}
   
   public abstract float getRunVel();
+  
+  public abstract State[] getPossibleStates();
   
   public void stopVel() {vel_x = 0;}
   

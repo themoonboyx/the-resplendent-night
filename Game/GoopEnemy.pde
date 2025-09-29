@@ -5,4 +5,6 @@ public class GoopEnemy extends Entity {
   }
   
   public float getRunVel() {return 2;}
+  
+  public State[] getPossibleStates() {return new State[]{State.IDLE, State.RUN};}
 }

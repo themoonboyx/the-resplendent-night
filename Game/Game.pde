@@ -7,7 +7,7 @@ public float camera_y = 0;
 
 // states that the player can be in
 public enum State {
-  IDLE(0, "idle"), RUN(0, "idle"), JUMP(-12, "idle");
+  IDLE(0, "idle"), RUN(0, "run"), JUMP(-12, "jump");
   
   private float vel_y;
   public String imgName;

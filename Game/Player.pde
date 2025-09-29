@@ -4,4 +4,6 @@ public class Player extends Entity {
   }
   
   public float getRunVel() {return 3;}
+  
+  public State[] getPossibleStates() {return State.values();}
 }
