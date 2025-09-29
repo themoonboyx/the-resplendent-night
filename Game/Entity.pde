@@ -29,7 +29,7 @@ public abstract class Entity {
         if (vel_x == 0) changeState(State.IDLE);
         else changeState(State.RUN);
       } else {
-        vel_y += 0.5;
+        vel_y += gravity;
         y += vel_y;
       }
     }

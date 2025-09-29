@@ -4,6 +4,7 @@ public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track o
 public PImage background;
 public float camera_x = 0;
 public float camera_y = 0;
+public float gravity = 0.5;
 
 // states that the player can be in
 public enum State {
