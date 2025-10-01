@@ -18,4 +18,6 @@ public class Room {
       p.advance();
     }
   }
+  
+  public Platform[] getPlatforms() {return platforms;}
 }

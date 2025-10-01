@@ -5,14 +5,19 @@ public abstract class Entity {
   private Type type;
   private float x;
   private float y;
+  private float w;
+  private float h;
   private float vel_x = 0;
   private float vel_y = 0;
   private HashMap<State, PImage[]> framesMap = new HashMap<>();
   private int immunity = 0;
   private int health = 3;
+  private boolean hasGravity;
 
-  public Entity(float x, String name, int size, Type type) {
+  public Entity(float x, float w, float h, String name, int size, Type type) {
     this.x = x;
+    this.w = w;
+    this.h = h;
     this.type = type;
     for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.getImgName());
@@ -22,13 +27,17 @@ public abstract class Entity {
       }
       framesMap.put(s, frames);
     }
-    y = height-framesMap.get(state)[frame].height/2.0;
+    y = height-framesMap.get(state)[frame].height-15;
+    hasGravity = true;
   }
-  
+
   public Entity(float x, float y, int w, int h, String name, Type type) {
     this.x = x;
     this.y = y;
+    this.w = w;
+    this.h = h;
     this.type = type;
+    hasGravity = false;
     for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.getImgName());
       PImage[] frames = new PImage[1];
@@ -40,45 +49,55 @@ public abstract class Entity {
   public void advance() {
     frame++;
     immunity--;
+    
     x += isRight ? vel_x : -vel_x;
-    if (state == State.JUMP) {
-      if (y + getImg().height/2.0 >= height && vel_y > 0) {
-        if (vel_x == 0) changeState(State.IDLE);
-        else changeState(State.RUN);
-      } else {
-        vel_y += gravity;
-        y += vel_y;
+    if (hasGravity) {
+      vel_y += gravity;
+      y += vel_y;
+    }
+    
+    for (Entity e : currentRoom.getPlatforms()) {
+      if (checkCollision(e)) {
+        collide(e);
       }
     }
+    
     for (Entity e : getPossibleCollisions()) {
-      if (immunity > 0) {
-        if (checkCollision(e)) {
-          if (e.getType() != type) {
-            switch (e.getType()) {
-              case ENEMY:
-                damage();
-                break;
-              case BLOCK:
-                collide(e);
-            }
-          }
-        }
+      if (checkCollision(e)) {
+        if (immunity < 0) damage();
       }
     }
+    
     if (isRight) image(getImg(), x-camera_x, y);
     else {
       pushMatrix();
       scale(-1, 1);
-      image(getImg(), -x+camera_x, y);
+      image(getImg(), -x+camera_x-getImg().width, y);
       popMatrix();
     }
   }
 
-  public PImage getImg() {return framesMap.get(state)[(frame/20)%framesMap.get(state).length];}
-  public float getX() {return x;}
-  public float getY() {return y;}
-  public State getState() {return state;}
-  public Type getType() {return type;}
+  public PImage getImg() {
+    return framesMap.get(state)[(frame/20)%framesMap.get(state).length];
+  }
+  public float getX() {
+    return x;
+  }
+  public float getY() {
+    return y;
+  }
+  public float getWidth() {
+    return w;
+  }
+  public float getHeight() {
+    return h;
+  }
+  public State getState() {
+    return state;
+  }
+  public Type getType() {
+    return type;
+  }
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
@@ -94,15 +113,15 @@ public abstract class Entity {
   }
 
   public boolean checkCollision(Entity e) {
-    if ((x-getImg().width/2.0 < e.getX()+e.getImg().width/2.0) &&
-      (x+getImg().width/2.0 > e.getX()-e.getImg().width/2.0) &&
-      (y-getImg().height/2.0 < e.getY()+e.getImg().height/2.0) &&
-      (y+getImg().height/2.0 > e.getY()-e.getImg().height/2.0)) {
+    if ((x + getImg().width/2.0 - w/2.0 < e.getX()+e.getWidth()) &&
+      (x + w > e.getX()) &&
+      (y + getImg().height - h < e.getY()+e.getHeight()) &&
+      (y + getImg().height > e.getY())) {
       return true;
     }
     return false;
   }
-  
+
   private void damage() {
     health--;
     if (health <= 0) {
@@ -111,13 +130,23 @@ public abstract class Entity {
     }
     immunity = 100;
   }
-  
+
   private void die() {
-    
   }
-  
+
   private void collide(Entity e) {
-    
+    y -= vel_y;
+    if (checkCollision(e)) {
+      y += vel_y;
+      x += isRight ? -vel_x : vel_x;
+    } else if (vel_y > 0) {
+      y = e.getY() - getImg().height;
+      vel_y = 0;
+      if (vel_x != 0) state = State.RUN;
+      else state = State.IDLE;
+    } else {
+      vel_y = 0;
+    }
   }
 
   public void changeState(State newState) {

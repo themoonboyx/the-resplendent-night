@@ -34,7 +34,6 @@ public void setup() {
   currentRoom = rooms[0];
   player = new Player();
   e1 = new GoopEnemy();
-  imageMode(CENTER);
   
   // add initial values to avoid glitches
   isKeyPressed.put("a", false);
@@ -45,15 +44,15 @@ public void setup() {
 }
 
 public void draw() {
-  camera_x = player.getX()-width/2.0;
+  camera_x = player.getX() - width/2.0 + player.getImg().width/2.0;
   
-  float bg_x = floor(camera_x/background.width)*background.width+background.width/2.0-camera_x;
-  image(background, bg_x, height/2.0);
-  image(background, bg_x + background.width, height/2.0);
+  float bg_x = floor(camera_x/background.width)*background.width-camera_x;
+  image(background, bg_x, 0);
+  image(background, bg_x + background.width, 0);
   
-  player.advance(); // draw and move the player
-  e1.advance();
   currentRoom.advance();
+  e1.advance();
+  player.advance(); // draw and move the player
 }
 
 // movement for player based on keyboard
