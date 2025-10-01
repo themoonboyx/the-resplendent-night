@@ -1,6 +1,6 @@
 public class Player extends Entity {
   public Player() {
-    super(width/2.0, "player", 72);
+    super(width/2.0, "player", 72, Type.SAFE);
   }
   
   public float getRunVel() {return 3;}

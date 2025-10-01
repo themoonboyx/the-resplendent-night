@@ -2,6 +2,7 @@ public abstract class Entity {
   private boolean isRight = true;
   private int frame = 0;
   private State state = State.IDLE;
+  private Type type;
   private float x;
   private float y;
   private float vel_x = 0;
@@ -10,8 +11,9 @@ public abstract class Entity {
   private int immunity = 0;
   private int health = 3;
 
-  public Entity(float x, String name, int size) {
+  public Entity(float x, String name, int size, Type type) {
     this.x = x;
+    this.type = type;
     for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.getImgName());
       PImage[] frames = new PImage[img.width/size];
@@ -22,9 +24,22 @@ public abstract class Entity {
     }
     y = height-framesMap.get(state)[frame].height/2.0;
   }
+  
+  public Entity(float x, float y, int w, int h, String name, Type type) {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    for (State s : getPossibleStates()) {
+      PImage img = loadImage(name+"/"+s.getImgName());
+      PImage[] frames = new PImage[1];
+      frames[0] = img.get(0, 0, w, h);
+      framesMap.put(s, frames);
+    }
+  }
 
   public void advance() {
     frame++;
+    immunity--;
     x += isRight ? vel_x : -vel_x;
     if (state == State.JUMP) {
       if (y + getImg().height/2.0 >= height && vel_y > 0) {
@@ -35,11 +50,18 @@ public abstract class Entity {
         y += vel_y;
       }
     }
-    immunity--;
     for (Entity e : getPossibleCollisions()) {
       if (immunity > 0) {
         if (checkCollision(e)) {
-          damage();
+          if (e.getType() != type) {
+            switch (e.getType()) {
+              case ENEMY:
+                damage();
+                break;
+              case BLOCK:
+                collide(e);
+            }
+          }
         }
       }
     }
@@ -56,6 +78,7 @@ public abstract class Entity {
   public float getX() {return x;}
   public float getY() {return y;}
   public State getState() {return state;}
+  public Type getType() {return type;}
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
@@ -90,6 +113,10 @@ public abstract class Entity {
   }
   
   private void die() {
+    
+  }
+  
+  private void collide(Entity e) {
     
   }
 

@@ -1,0 +1,16 @@
+{
+  "rooms": [
+    {
+      "width": 864,
+      "height": 576,
+      "platforms": [
+        {
+          "x": 450,
+          "y": 480,
+          "width": 90,
+          "height": 15
+        }
+      ]
+    }
+  ]
+}

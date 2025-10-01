@@ -1,10 +1,13 @@
 public Player player;
 public GoopEnemy e1;
+public Room[] rooms;
+public Room currentRoom;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 public PImage background;
 public float camera_x = 0;
 public float camera_y = 0;
 public float gravity = 0.5;
+public JSONObject json;
 
 // states that the player can be in
 public enum State {
@@ -22,9 +25,13 @@ public enum State {
   public String getImgName() {return imgName;}
 }
 
+public enum Type {SAFE, ENEMY, BLOCK};
+
 public void setup() {
   size(576, 576, P2D);
   background = loadImage("background/background0.2.png");
+  loadData();
+  currentRoom = rooms[0];
   player = new Player();
   e1 = new GoopEnemy();
   imageMode(CENTER);
@@ -46,6 +53,7 @@ public void draw() {
   
   player.advance(); // draw and move the player
   e1.advance();
+  currentRoom.advance();
 }
 
 // movement for player based on keyboard
@@ -85,5 +93,15 @@ public void keyReleased() {
     player.startVel(true);
   } else if (!isKeyPressed.get("d")) {
     player.startVel(false);
+  }
+}
+
+public void loadData() {
+  json = loadJSONObject("rooms/rooms.json");
+  JSONArray roomData = json.getJSONArray("rooms");
+  rooms = new Room[roomData.size()];
+  
+  for (int i = 0; i < roomData.size(); i++) {
+    rooms[i] = new Room(roomData.getJSONObject(i));
   }
 }
