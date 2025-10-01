@@ -38,8 +38,7 @@ public void setup() {
 }
 
 public void draw() {
-  if (player.getX()-camera_x > width*0.8) camera_x = player.getX()-width*0.8;
-  if (player.getX()-camera_x < width*0.2) camera_x = player.getX()-width*0.2;
+  camera_x = player.getX()-width/2.0;
   
   float bg_x = floor(camera_x/background.width)*background.width+background.width/2.0-camera_x;
   image(background, bg_x, height/2.0);
