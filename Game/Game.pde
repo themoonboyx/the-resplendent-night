@@ -4,6 +4,7 @@ public Room[] rooms;
 public Room currentRoom;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 public PImage background;
+public PImage heart;
 public float camera_x = 0;
 public float camera_y = 0;
 public float gravity = 0.5;
@@ -30,6 +31,7 @@ public enum Type {SAFE, ENEMY, BLOCK};
 public void setup() {
   size(576, 576, P2D);
   background = loadImage("background/background0.2.png");
+  heart = loadImage("UI/heart.png");
   loadData();
   currentRoom = rooms[0];
   player = new Player();
@@ -53,6 +55,7 @@ public void draw() {
   currentRoom.advance();
   e1.advance();
   player.advance(); // draw and move the player
+  drawUI();
 }
 
 // movement for player based on keyboard
@@ -102,5 +105,11 @@ public void loadData() {
   
   for (int i = 0; i < roomData.size(); i++) {
     rooms[i] = new Room(roomData.getJSONObject(i));
+  }
+}
+
+public void drawUI() {
+  for (int i = 0; i < player.getHealth(); i++) {
+    image(heart, (i+0.2)*heart.width*1.25, 0.25*heart.height);
   }
 }

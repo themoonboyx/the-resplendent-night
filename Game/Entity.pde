@@ -98,6 +98,9 @@ public abstract class Entity {
   public Type getType() {
     return type;
   }
+  public int getHealth() {
+    return health;
+  }
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
