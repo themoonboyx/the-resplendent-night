@@ -13,6 +13,7 @@ public abstract class Entity {
   private int immunity = 0;
   private int health = 3;
   private boolean hasGravity;
+  private boolean inAir = true;
 
   public Entity(float x, float w, float h, String name, int size, Type type) {
     this.x = x;
@@ -49,25 +50,27 @@ public abstract class Entity {
   public void advance() {
     frame++;
     immunity--;
-    
+
     x += isRight ? vel_x : -vel_x;
     if (hasGravity) {
       vel_y += gravity;
       y += vel_y;
-    }
-    
-    for (Entity e : currentRoom.getPlatforms()) {
-      if (checkCollision(e)) {
-        collide(e);
+      
+      inAir = true;
+      for (Entity e : currentRoom.getPlatforms()) {
+        if (checkCollision(e)) {
+          collide(e);
+        }
       }
+      if (inAir) state = State.JUMP;
     }
-    
+
     for (Entity e : getPossibleCollisions()) {
       if (checkCollision(e)) {
         if (immunity < 0) damage();
       }
     }
-    
+
     if (isRight) image(getImg(), x-camera_x, y);
     else {
       pushMatrix();
@@ -145,10 +148,12 @@ public abstract class Entity {
     } else if (vel_y > 0) {
       y = e.getY() - getImg().height;
       vel_y = 0;
+      inAir = false;
       if (vel_x != 0) state = State.RUN;
       else state = State.IDLE;
     } else {
       vel_y = 0;
+      inAir = false;
     }
   }
 

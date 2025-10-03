@@ -65,7 +65,7 @@ public void keyPressed() {
   isKeyPressed.put(keyS, true);
   
   if (player.getState() == State.JUMP) { // if the player is jumping, keep jumping, but can move left and right
-    if (keyS.equals("a")) player.startVel(false);
+    if (keyS.equals("a")) player.startVel(false); //<>//
     if (keyS.equals("d")) player.startVel(true);
   } else {
     switch(keyS) {
