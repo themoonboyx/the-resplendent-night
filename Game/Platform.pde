@@ -7,5 +7,4 @@ public class Platform extends Entity {
   
   public float getRunVel() {return 0;}
   public State[] getPossibleStates() {return new State[]{State.IDLE};}
-  public Entity[] getPossibleCollisions() {return new Entity[]{};}
 }

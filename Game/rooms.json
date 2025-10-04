@@ -13,6 +13,8 @@
           "height": 150
         }
       ],
+      "enemies": [
+      ],
       "platforms": [
         {
           "x": 0,
@@ -75,6 +77,14 @@
           "y": 381,
           "width": 3,
           "height": 180
+        }
+      ],
+      "enemies": [
+        {
+          "name": "goop",
+          "x": 300,
+          "y": 561,
+          "max_x": 540
         }
       ],
       "platforms": [

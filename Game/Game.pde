@@ -25,7 +25,7 @@ public enum State {
   public String getImgName() {return imgName;}
 }
 
-public enum Type {SAFE, ENEMY, BLOCK};
+public enum Type {PLAYER, ENEMY, BLOCK};
 
 public void setup() {
   size(576, 576, P2D);

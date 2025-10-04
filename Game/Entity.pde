@@ -55,7 +55,7 @@ public abstract class Entity {
     if (hasGravity) {
       vel_y += gravity;
       y += vel_y;
-      
+
       inAir = true;
       for (Entity e : currentRoom.getPlatforms()) {
         if (checkCollision(e)) {
@@ -65,9 +65,11 @@ public abstract class Entity {
       if (inAir) state = State.JUMP;
     }
 
-    for (Entity e : getPossibleCollisions()) {
-      if (checkCollision(e)) {
-        if (immunity < 0) damage();
+    if (type == Type.PLAYER) {
+      for (Entity e : currentRoom.getEnemies()) {
+        if (checkCollision(e)) {
+          if (immunity < 0) damage();
+        }
       }
     }
 
@@ -107,7 +109,6 @@ public abstract class Entity {
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
-  public abstract Entity[] getPossibleCollisions();
 
   public void stopVel() {
     vel_x = 0;
@@ -117,7 +118,7 @@ public abstract class Entity {
     vel_x = getRunVel();
     isRight = right;
   }
-  
+
   public void resetPos(int newID) {
     Connection entrance = rooms[newID].getConnection(currentRoom.getID());
     x = entrance.getX();
