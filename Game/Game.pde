@@ -1,5 +1,4 @@
 public Player player;
-public GoopEnemy e1;
 public Room[] rooms;
 public Room currentRoom;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
@@ -35,7 +34,6 @@ public void setup() {
   loadData();
   currentRoom = rooms[0];
   player = new Player();
-  e1 = new GoopEnemy();
   
   // add initial values to avoid glitches
   isKeyPressed.put("a", false);
@@ -46,14 +44,17 @@ public void setup() {
 }
 
 public void draw() {
+  if (player.getX() >= currentRoom.getWidth()) enterRoom(currentRoom.getNext());
+  
   camera_x = player.getX() - width/2.0 + player.getImg().width/2.0;
+  if (camera_x < 0) camera_x = 0;
+  else if (camera_x > currentRoom.getWidth() - width) camera_x = currentRoom.getWidth() - width;
   
   float bg_x = floor(camera_x/background.width)*background.width-camera_x;
   image(background, bg_x, 0);
   image(background, bg_x + background.width, 0);
   
   currentRoom.advance();
-  e1.advance();
   player.advance(); // draw and move the player
   drawUI();
 }
@@ -99,17 +100,21 @@ public void keyReleased() {
 }
 
 public void loadData() {
-  json = loadJSONObject("rooms/rooms.json");
+  json = loadJSONObject("rooms.json");
   JSONArray roomData = json.getJSONArray("rooms");
   rooms = new Room[roomData.size()];
   
   for (int i = 0; i < roomData.size(); i++) {
-    rooms[i] = new Room(roomData.getJSONObject(i));
+    rooms[i] = new Room(roomData.getJSONObject(i), i);
   }
 }
 
 public void drawUI() {
   for (int i = 0; i < player.getHealth(); i++) {
-    image(heart, (i+0.2)*heart.width*1.25, 0.25*heart.height);
+    image(heart, 18+i*heart.width*1.25, 18);
   }
+}
+
+public void enterRoom(Room newRoom) {
+  currentRoom = newRoom;
 }
