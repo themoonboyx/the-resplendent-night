@@ -5,6 +5,8 @@ public abstract class Entity {
   private Type type;
   private float x;
   private float y;
+  private Float min_x;
+  private Float max_x;
   private float w;
   private float h;
   private float vel_x = 0;
@@ -14,9 +16,11 @@ public abstract class Entity {
   private int health = 3;
   private boolean hasGravity;
   private boolean inAir = true;
-
-  public Entity(float x, float w, float h, String name, int size, Type type) {
+  
+  public Entity(float x, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
     this.x = x;
+    this.min_x = min_x;
+    this.max_x = max_x;
     this.w = w;
     this.h = h;
     this.type = type;
@@ -34,6 +38,8 @@ public abstract class Entity {
 
   public Entity(float x, float y, int w, int h, String name, Type type) {
     this.x = x;
+    this.min_x = Float.NaN;
+    this.max_x = Float.NaN;
     this.y = y;
     this.w = w;
     this.h = h;
@@ -71,6 +77,13 @@ public abstract class Entity {
           if (immunity < 0) damage();
         }
       }
+    }
+    
+    if (!Float.isNaN(min_x)) {
+      if (x < min_x) startVel(true);
+    }
+    if (!Float.isNaN(max_x)) {
+      if (x > max_x) startVel(false);
     }
 
     if (isRight) image(getImg(), x-camera_x, y);

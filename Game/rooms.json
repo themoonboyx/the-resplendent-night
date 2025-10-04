@@ -82,9 +82,11 @@
       "enemies": [
         {
           "name": "goop",
-          "x": 300,
+          "x": 432,
           "y": 561,
-          "max_x": 540
+          "isRight": false,
+          "min_x": 300,
+          "max_x": 564
         }
       ],
       "platforms": [
@@ -110,30 +112,12 @@
           "x": 849,
           "y": 0,
           "width": 15,
-          "height": 30
+          "height": 381
         },
         {
-          "x": 849,
-          "y": 180,
-          "width": 15,
-          "height": 396
-        },
-        {
-          "x": 450,
+          "x": 387,
           "y": 450,
           "width": 90,
-          "height": 15
-        },
-        {
-          "x": 300,
-          "y": 330,
-          "width": 120,
-          "height": 15
-        },
-        {
-          "x": 510,
-          "y": 222,
-          "width": 180,
           "height": 15
         }
       ]
