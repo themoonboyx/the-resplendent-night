@@ -116,5 +116,6 @@ public void drawUI() {
 }
 
 public void enterRoom(Room newRoom) {
+  player.resetPos();
   currentRoom = newRoom;
 }

@@ -28,7 +28,7 @@ public abstract class Entity {
       }
       framesMap.put(s, frames);
     }
-    y = height-framesMap.get(state)[frame].height-15;
+    y = height-getImg().height-15;
     hasGravity = true;
   }
 
@@ -116,6 +116,11 @@ public abstract class Entity {
   public void startVel(boolean right) {
     vel_x = getRunVel();
     isRight = right;
+  }
+  
+  public void resetPos() {
+    x -= currentRoom.getWidth();
+    y = height-getImg().height-15;
   }
 
   public boolean checkCollision(Entity e) {
