@@ -31,9 +31,9 @@ public void setup() {
   size(576, 576, P2D);
   background = loadImage("background/background0.2.png");
   heart = loadImage("UI/heart.png");
+  player = new Player();
   loadData();
   currentRoom = rooms[0];
-  player = new Player();
   
   // add initial values to avoid glitches
   isKeyPressed.put("a", false);
@@ -44,7 +44,7 @@ public void setup() {
 }
 
 public void draw() {
-  if (player.getX() >= currentRoom.getWidth()) enterRoom(currentRoom.getNext());
+  if (rooms[currentRoom.checkExits()] != currentRoom) enterRoom(currentRoom.checkExits());
   
   camera_x = player.getX() - width/2.0 + player.getImg().width/2.0;
   if (camera_x < 0) camera_x = 0;
@@ -105,7 +105,7 @@ public void loadData() {
   rooms = new Room[roomData.size()];
   
   for (int i = 0; i < roomData.size(); i++) {
-    rooms[i] = new Room(roomData.getJSONObject(i), i);
+    rooms[i] = new Room(roomData.getJSONObject(i));
   }
 }
 
@@ -115,7 +115,7 @@ public void drawUI() {
   }
 }
 
-public void enterRoom(Room newRoom) {
-  player.resetPos();
-  currentRoom = newRoom;
+public void enterRoom(int newID) {
+  player.resetPos(newID);
+  currentRoom = rooms[newID];
 }

@@ -118,9 +118,12 @@ public abstract class Entity {
     isRight = right;
   }
   
-  public void resetPos() {
-    x -= currentRoom.getWidth();
-    y = height-getImg().height-15;
+  public void resetPos(int newID) {
+    Connection entrance = rooms[newID].getConnection(currentRoom.getID());
+    x = entrance.getX();
+    if (entrance.getX() <= 0) x += entrance.getWidth();
+    else x -= getImg().width;
+    y = entrance.getY()+entrance.getHeight()-getImg().height;
   }
 
   public boolean checkCollision(Entity e) {
