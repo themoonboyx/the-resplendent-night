@@ -128,6 +128,8 @@ public abstract class Entity {
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
 
+  public void setGravity(boolean hasGravity) {this.hasGravity = hasGravity;}
+
   public void stopVel() {
     vel_x = 0;
   }

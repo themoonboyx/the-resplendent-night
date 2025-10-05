@@ -89,8 +89,8 @@ public void drawSelect() {
   image(backgrounds.get(GameState.SELECT), 0, 0);
   currentRoom = null;
   for (int i = 0; i < rooms.length; i++) {
-    float x = (1.25*i+1)*level[0].width;
-    float y = level[0].height;
+    float x = (1.25*(i%4)+1)*level[0].width;
+    float y = level[0].height*(1+(i/4)*1.25);
     if (!rooms[i].getIsUnlocked()) image(level[2], x, y);
     else {
       if (mouseX >= x && mouseX <= x+level[0].width &&
