@@ -16,7 +16,7 @@ public abstract class Entity {
   private boolean hasGravity;
   private boolean inAir = true;
   
-  public Entity(float x, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
+  public Entity(float x, Float y, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
     this.x = x;
     this.start_x = x;
     this.min_x = min_x;
@@ -32,12 +32,14 @@ public abstract class Entity {
       }
       framesMap.put(s, frames);
     }
-    y = height-getImg().height-15;
     hasGravity = true;
+    if (Float.isNaN(y)) this.y = height-getImg().height-15;
+    else this.y = y-h;
   }
 
   public Entity(float x, float y, int w, int h, String name, Type type) {
     this.x = x;
+    this.start_x = x;
     this.min_x = Float.NaN;
     this.max_x = Float.NaN;
     this.y = y;
@@ -68,9 +70,12 @@ public abstract class Entity {
         }
       }
       if (inAir) {
-        if (vel_y < -gravity*20.0) state = State.JUMP_DOWN;
-        else if (vel_y < -gravity) state = State.JUMP;
-        else state = State.JUMP_UP;
+        if (type != Type.PLAYER) state = State.JUMP;
+        else {
+          if (vel_y < -gravity*20.0) state = State.JUMP_DOWN;
+          else if (vel_y < -gravity) state = State.JUMP;
+          else state = State.JUMP_UP;
+        }
       }
     }
 
@@ -86,7 +91,7 @@ public abstract class Entity {
       if (x < min_x) startVel(true);
     }
     if (!Float.isNaN(max_x)) {
-      if (x > max_x) startVel(false);
+      if (x + w > max_x) startVel(false);
     }
 
     if (isRight) image(getImg(), x-camera_x, y);

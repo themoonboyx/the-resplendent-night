@@ -128,6 +128,11 @@ public void drawPlaying() {
 
 // movement for player based on keyboard
 public void keyPressed() {
+  if (key == '\\') { // DELETE LATER! for debugging
+    for (Room room : rooms) {
+      room.unlock();
+    }
+  }
   if (gameState != GameState.PLAYING) return;
   String keyS = key + "";
   keyS = keyS.toLowerCase();

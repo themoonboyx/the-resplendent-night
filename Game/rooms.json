@@ -79,7 +79,7 @@
           "height": 180
         },
         {
-          "id": -1,
+          "id": 2,
           "x": 864,
           "y": 381,
           "width": 3,
@@ -125,6 +125,77 @@
           "x": 387,
           "y": 450,
           "width": 90,
+          "height": 15
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "width": 864,
+      "height": 576,
+      "connections": [
+        {
+          "id": 1,
+          "x": -3,
+          "y": 381,
+          "width": 3,
+          "height": 180
+        },
+        {
+          "id": -1,
+          "x": 864,
+          "y": 381,
+          "width": 3,
+          "height": 180
+        }
+      ],
+      "enemies": [
+        {
+          "name": "goop",
+          "x": 432,
+          "y": 561,
+          "isRight": false,
+          "min_x": 300,
+          "max_x": 564
+        },
+        {
+          "name": "goop",
+          "x": 360,
+          "y": 450,
+          "isRight": true,
+          "min_x": 330,
+          "max_x": 534
+        }
+      ],
+      "platforms": [
+        {
+          "x": 0,
+          "y": 561,
+          "width": 864,
+          "height": 15
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 864,
+          "height": 15
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 15,
+          "height": 381
+        },
+        {
+          "x": 849,
+          "y": 0,
+          "width": 15,
+          "height": 381
+        },
+        {
+          "x": 330,
+          "y": 450,
+          "width": 204,
           "height": 15
         }
       ]
