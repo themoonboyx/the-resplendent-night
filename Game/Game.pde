@@ -4,7 +4,7 @@ public Room currentRoom;
 public GameState gameState = GameState.TITLE;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 public HashMap<GameState, PImage> backgrounds = new HashMap<>();
-public PImage level;
+public PImage[] level = new PImage[3];
 public PImage heart;
 public float camera_x = 0;
 public float camera_y = 0;
@@ -47,7 +47,11 @@ public void setup() {
   for (GameState gs : GameState.values()) {
     backgrounds.put(gs, loadImage(gs.getImgName()));
   }
-  level = loadImage("selectScreen/level.png");
+  
+  PImage l = loadImage("selectScreen/level.png");
+  for (int i = 0; i < level.length; i++) {
+    level[i] = l.get(i*l.width/level.length, 0, l.width/level.length, l.height);
+  }
   heart = loadImage("UI/heart.png");
   player = new Player();
   loadData();
@@ -84,12 +88,18 @@ public void drawSelect() {
   image(backgrounds.get(GameState.SELECT), 0, 0);
   currentRoom = null;
   for (int i = 0; i < rooms.length; i++) {
-    float x = (1.25*i+1)*level.width;
-    float y = level.height;
-    if (mouseX >= x && mouseX <= x+level.width &&
-      mouseY >= y && mouseY <= y+level.height) currentRoom = rooms[i];
-    image(level, x, y);
-    text(i+1, x+0.5*level.width-8.0, y+0.5*level.height+8.0);
+    float x = (1.25*i+1)*level[0].width;
+    float y = level[0].height;
+    if (!rooms[i].getIsUnlocked()) image(level[2], x, y);
+    else {
+      if (mouseX >= x && mouseX <= x+level[0].width &&
+      mouseY >= y && mouseY <= y+level[0].height) {
+      currentRoom = rooms[i];
+      image(level[1], x, y);
+      } else image(level[0], x, y);
+    
+      text(i+1, x+0.5*level[0].width-8.0, y+0.5*level[0].height+8.0);
+    }
   }
 }
 
@@ -165,6 +175,8 @@ public void loadData() {
   for (int i = 0; i < roomData.size(); i++) {
     rooms[i] = new Room(roomData.getJSONObject(i));
   }
+  
+  rooms[0].unlock();
 }
 
 public void drawUI() {
@@ -176,4 +188,5 @@ public void drawUI() {
 public void enterRoom(int newID) {
   player.resetPos(newID);
   currentRoom = rooms[newID];
+  currentRoom.unlock();
 }

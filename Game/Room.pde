@@ -1,5 +1,6 @@
 public class Room {
   private int id;
+  private boolean isUnlocked = false;
   private float w;
   private float h;
   private HashMap<Integer, Connection> connections = new HashMap<>();
@@ -42,12 +43,17 @@ public class Room {
   }
   
   public int getID() {return id;}
+  public boolean getIsUnlocked() {return isUnlocked;}
   public float getWidth() {return w;}
   public float getHeight() {return h;}
   public Platform[] getPlatforms() {return platforms;}
   public Entity[] getEnemies() {return enemies;}
   
   public Connection getConnection(int connID) {return connections.get(connID);}
+  
+  public void unlock() {
+    isUnlocked = true;
+  }
   
   public int checkExits() {
     for (Integer connID : connections.keySet()) {
