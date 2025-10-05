@@ -132,6 +132,13 @@ public abstract class Entity {
     isRight = right;
   }
 
+  public void reset() {
+    x = width/3.0;
+    y = height-getImg().height-15;
+    health = 3;
+    changeState(State.IDLE);
+  }
+  
   public void resetPos(int newID) {
     Connection entrance = rooms[newID].getConnection(currentRoom.getID());
     x = entrance.getX();

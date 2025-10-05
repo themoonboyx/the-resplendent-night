@@ -104,7 +104,12 @@ public void drawSelect() {
 }
 
 public void drawPlaying() {
-  if (rooms[currentRoom.checkExits()] != currentRoom) enterRoom(currentRoom.checkExits());
+  int exit = currentRoom.checkExits();
+  if (exit == -1) {
+    gameState = GameState.TITLE;
+    return;
+  }
+  if (rooms[exit] != currentRoom) enterRoom(exit);
   
   camera_x = player.getX() - width/2.0 + player.getImg().width/2.0;
   if (camera_x < 0) camera_x = 0;
@@ -164,6 +169,7 @@ public void keyReleased() {
 
 public void mouseClicked() {
   if (gameState != GameState.SELECT || currentRoom == null) return;
+  player.reset();
   gameState = GameState.PLAYING;
 }
 
