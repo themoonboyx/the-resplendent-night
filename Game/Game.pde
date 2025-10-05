@@ -5,7 +5,6 @@ public GameState gameState = GameState.TITLE;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 public HashMap<GameState, PImage> backgrounds = new HashMap<>();
 public PImage[] level = new PImage[3];
-public PImage heart;
 public float camera_x = 0;
 public float camera_y = 0;
 public float gravity = 0.5;
@@ -13,18 +12,21 @@ public JSONObject json;
 
 // states that the player can be in
 public enum State {
-  IDLE(0, "idle"), RUN(0, "run"), JUMP(-12, "jump");
+  IDLE(0, "idle", false), RUN(0, "run", false), JUMP_UP(-12, "jump-", true), JUMP(0, "jump", true), JUMP_DOWN(0, "jump+", true);
   
   private float vel_y;
   private String imgName;
+  private boolean inAir;
   
-  private State(float vel_y, String imgName) {
+  private State(float vel_y, String imgName, boolean inAir) {
     this.vel_y = vel_y;
     this.imgName = imgName+".png";
+    this.inAir = inAir;
   }
   
   public float getVelY() {return vel_y;}
   public String getImgName() {return imgName;}
+  public boolean isInAir() {return inAir;}
 }
 
 public enum Type {PLAYER, ENEMY, BLOCK};
@@ -52,7 +54,6 @@ public void setup() {
   for (int i = 0; i < level.length; i++) {
     level[i] = l.get(i*l.width/level.length, 0, l.width/level.length, l.height);
   }
-  heart = loadImage("UI/heart.png");
   player = new Player();
   loadData();
   currentRoom = null;
@@ -132,7 +133,7 @@ public void keyPressed() {
   keyS = keyS.toLowerCase();
   isKeyPressed.put(keyS, true);
   
-  if (player.getState() == State.JUMP) { // if the player is jumping, keep jumping, but can move left and right
+  if (player.getState().isInAir()) { // if the player is jumping, keep jumping, but can move left and right
     if (keyS.equals("a")) player.startVel(false); //<>//
     if (keyS.equals("d")) player.startVel(true);
   } else {
@@ -144,7 +145,7 @@ public void keyPressed() {
         player.changeState(State.RUN, true);
         break;
       case "w":
-        player.changeState(State.JUMP);
+        player.changeState(State.JUMP_UP);
         break;
     }
   }
@@ -158,7 +159,7 @@ public void keyReleased() {
   
   // if no left/right movement is being pressed, stop moving (horizontally)
   if (!isKeyPressed.get("a") && !isKeyPressed.get("d")) {
-    if (player.getState() == State.JUMP) player.stopVel();
+    if (player.getState().isInAir()) player.stopVel();
     else player.changeState(State.IDLE);
   } else if (!isKeyPressed.get("a")) {
     player.startVel(true);
@@ -186,9 +187,6 @@ public void loadData() {
 }
 
 public void drawUI() {
-  for (int i = 0; i < player.getHealth(); i++) {
-    image(heart, 18+i*heart.width*1.25, 18);
-  }
 }
 
 public void enterRoom(int newID) {

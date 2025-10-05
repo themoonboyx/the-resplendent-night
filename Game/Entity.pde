@@ -12,8 +12,6 @@ public abstract class Entity {
   private float vel_x = 0;
   private float vel_y = 0;
   private HashMap<State, PImage[]> framesMap = new HashMap<>();
-  private int immunity = 0;
-  private int health = 3;
   private boolean hasGravity;
   private boolean inAir = true;
   
@@ -55,7 +53,6 @@ public abstract class Entity {
 
   public void advance() {
     frame++;
-    immunity--;
 
     x += isRight ? vel_x : -vel_x;
     if (hasGravity) {
@@ -68,13 +65,17 @@ public abstract class Entity {
           collide(e);
         }
       }
-      if (inAir) state = State.JUMP;
+      if (inAir) {
+        if (vel_y < -gravity*20.0) state = State.JUMP_DOWN;
+        else if (vel_y < -gravity) state = State.JUMP;
+        else state = State.JUMP_UP;
+      }
     }
 
     if (type == Type.PLAYER) {
       for (Entity e : currentRoom.getEnemies()) {
         if (checkCollision(e)) {
-          if (immunity < 0) damage();
+          damage();
         }
       }
     }
@@ -116,9 +117,6 @@ public abstract class Entity {
   public Type getType() {
     return type;
   }
-  public int getHealth() {
-    return health;
-  }
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
@@ -135,7 +133,6 @@ public abstract class Entity {
   public void reset() {
     x = width/3.0;
     y = height-getImg().height-15;
-    health = 3;
     changeState(State.IDLE);
   }
   
@@ -158,15 +155,7 @@ public abstract class Entity {
   }
 
   private void damage() {
-    health--;
-    if (health <= 0) {
-      die();
-      return;
-    }
-    immunity = 100;
-  }
-
-  private void die() {
+    reset();
   }
 
   private void collide(Entity e) {
