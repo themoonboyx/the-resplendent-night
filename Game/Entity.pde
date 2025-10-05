@@ -7,6 +7,7 @@ public abstract class Entity {
   private float y;
   private Float min_x;
   private Float max_x;
+  private float start_x;
   private float w;
   private float h;
   private float vel_x = 0;
@@ -17,6 +18,7 @@ public abstract class Entity {
   
   public Entity(float x, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
     this.x = x;
+    this.start_x = x;
     this.min_x = min_x;
     this.max_x = max_x;
     this.w = w;
@@ -131,9 +133,9 @@ public abstract class Entity {
   }
 
   public void reset() {
-    x = width/3.0;
+    x = start_x;
     y = height-getImg().height-15;
-    changeState(State.IDLE);
+    changeState(State.IDLE, true);
   }
   
   public void resetPos(int newID) {
