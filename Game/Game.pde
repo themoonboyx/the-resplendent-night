@@ -195,7 +195,7 @@ public void drawUI() {
 }
 
 public void enterRoom(int newID) {
-  player.resetPos(newID);
+  player.enter(newID);
   currentRoom = rooms[newID];
   currentRoom.unlock();
 }

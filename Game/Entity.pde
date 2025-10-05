@@ -8,6 +8,7 @@ public abstract class Entity {
   private Float min_x;
   private Float max_x;
   private float start_x;
+  private float start_y;
   private float w;
   private float h;
   private float vel_x = 0;
@@ -15,7 +16,8 @@ public abstract class Entity {
   private HashMap<State, PImage[]> framesMap = new HashMap<>();
   private boolean hasGravity;
   private boolean inAir = true;
-  
+  private boolean isChasing = false;
+
   public Entity(float x, Float y, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
     this.x = x;
     this.start_x = x;
@@ -35,6 +37,7 @@ public abstract class Entity {
     hasGravity = true;
     if (Float.isNaN(y)) this.y = height-getImg().height-15;
     else this.y = y-h;
+    this.start_y = this.y;
   }
 
   public Entity(float x, float y, int w, int h, String name, Type type) {
@@ -43,6 +46,7 @@ public abstract class Entity {
     this.min_x = Float.NaN;
     this.max_x = Float.NaN;
     this.y = y;
+    this.start_y = y;
     this.w = w;
     this.h = h;
     this.type = type;
@@ -58,27 +62,36 @@ public abstract class Entity {
   public void advance() {
     frame++;
 
-    x += isRight ? vel_x : -vel_x;
-    if (hasGravity) {
-      vel_y += gravity;
-      y += vel_y;
-
-      inAir = true;
-      for (Entity e : currentRoom.getPlatforms()) {
-        if (checkCollision(e)) {
-          collide(e);
-        }
-      }
-      if (inAir) {
-        if (type != Type.PLAYER) state = State.JUMP;
-        else {
-          if (vel_y < -gravity*20.0) state = State.JUMP_DOWN;
-          else if (vel_y < -gravity) state = State.JUMP;
-          else state = State.JUMP_UP;
-        }
-      }
+    if (isChasing) {
+      vel_x = getRunVel();
+      if (player.getX() < x) isRight = false;
+      else if (player.getX() > x) isRight = true;
+      else vel_x = 0;
+      if (player.getY() < y) vel_y = getRunVel() * -1;
+      else if (player.getY() > y) vel_y = getRunVel();
+      else vel_y = 0;
     }
 
+    x += isRight ? vel_x : -vel_x;
+    if (hasGravity) vel_y += gravity;
+    y += vel_y;
+
+    inAir = true;
+    for (Entity e : currentRoom.getPlatforms()) {
+      if (checkCollision(e)) {
+        collide(e);
+      }
+    }
+    
+    if (inAir && hasGravity) {
+      if (type != Type.PLAYER) state = State.JUMP;
+      else {
+        if (vel_y < -gravity*20.0) state = State.JUMP_DOWN;
+        else if (vel_y < -gravity) state = State.JUMP;
+        else state = State.JUMP_UP;
+      }
+    }
+    
     if (type == Type.PLAYER) {
       for (Entity e : currentRoom.getEnemies()) {
         if (checkCollision(e)) {
@@ -86,7 +99,7 @@ public abstract class Entity {
         }
       }
     }
-    
+
     if (!Float.isNaN(min_x)) {
       if (x < min_x) startVel(true);
     }
@@ -128,7 +141,12 @@ public abstract class Entity {
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
 
-  public void setGravity(boolean hasGravity) {this.hasGravity = hasGravity;}
+  public void setGravity(boolean hasGravity) {
+    this.hasGravity = hasGravity;
+  }
+  public void setChasing(boolean chasing) {
+    isChasing = chasing;
+  }
 
   public void stopVel() {
     vel_x = 0;
@@ -141,11 +159,12 @@ public abstract class Entity {
 
   public void reset() {
     x = start_x;
-    y = height-getImg().height-15;
-    changeState(State.IDLE, true);
+    y = start_y;
+    if (type != Type.ENEMY) changeState(State.IDLE, true);
+    else changeState(State.RUN, false);
   }
-  
-  public void resetPos(int newID) {
+
+  public void enter(int newID) {
     Connection entrance = rooms[newID].getConnection(currentRoom.getID());
     x = entrance.getX();
     if (entrance.getX() <= 0) x += entrance.getWidth();
@@ -165,6 +184,9 @@ public abstract class Entity {
 
   private void damage() {
     reset();
+    for (Entity e : currentRoom.getEnemies()) {
+      e.reset();
+    }
   }
 
   private void collide(Entity e) {
