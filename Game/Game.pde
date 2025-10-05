@@ -87,9 +87,10 @@ public void drawTitle() {
 
 public void drawSelect() {
   image(backgrounds.get(GameState.SELECT), 0, 0);
+  text("SELECT LEVEL", width/3.0, 50);
   currentRoom = null;
   for (int i = 0; i < rooms.length; i++) {
-    float x = (1.25*(i%4)+1)*level[0].width;
+    float x = ((i%4)+0.5)*width/5.0 + 0.5*(width/5.0-level[0].width);
     float y = level[0].height*(1+(i/4)*1.25);
     if (!rooms[i].getIsUnlocked()) image(level[2], x, y);
     else {
