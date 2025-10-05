@@ -23,6 +23,8 @@ public class Room {
       switch(enemyData.getJSONObject(i).getString("name")) {
         case "goop":
         enemies[i] = new GoopEnemy(enemyData.getJSONObject(i));
+        case "fly":
+        enemies[i] = new FlyEnemy(enemyData.getJSONObject(i));
       }
     }
     
