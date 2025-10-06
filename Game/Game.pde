@@ -144,6 +144,7 @@ public void drawLevels() {
       text(i+1, x+0.5*level[0].width-8.0, y+0.5*level[0].height+8.0);
     }
   }
+  text("Use WASD to move, select level with mouse", 16, ((rooms.length/4)*1.25+2.5)*level[0].height);
 }
 
 // movement for player based on keyboard
