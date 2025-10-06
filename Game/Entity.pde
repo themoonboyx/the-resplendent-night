@@ -1,23 +1,25 @@
+// interactable objects within the game (player, enemies, platforms, entrances/exits)
 public abstract class Entity {
-  private boolean isRight = true;
-  private int frame = 0;
-  private State state = State.IDLE;
-  private Type type;
-  private float x;
-  private float y;
-  private Float min_x;
-  private Float max_x;
-  private float start_x;
-  private float start_y;
-  private float w;
-  private float h;
-  private float vel_x = 0;
-  private float vel_y = 0;
-  private HashMap<State, PImage[]> framesMap = new HashMap<>();
-  private boolean hasGravity;
-  private boolean inAir = true;
-  private boolean isChasing = false;
+  private boolean isRight = true; // is it currently looking to the right?
+  private int frame = 0; // current frame in animation
+  private State state = State.IDLE; // current movement state
+  private Type type; // type of Entity
+  private float x; // x pos in world
+  private float y; // y pos in world
+  private Float min_x; // minimum x pos (if this is NaN, then it doesn't have one)
+  private Float max_x; // maximum x pos
+  private float start_x; // starting x pos (for (re)loading a room)
+  private float start_y; // starting y pos
+  private float w; // width
+  private float h; // height
+  private float vel_x = 0; // x velocity
+  private float vel_y = 0; // y velocity (note: +ve values mean go down, -ve values mean go up)
+  private HashMap<State, PImage[]> framesMap = new HashMap<>(); // image animations for each state
+  private boolean hasGravity; // whether Entity is affected by gravity
+  private boolean inAir = true; // whether currently in air
+  private boolean isChasing = false; // whether Entity chases the player
 
+  // create new Entity (player and enemies use this version)
   public Entity(float x, Float y, Float min_x, Float max_x, float w, float h, String name, int size, Type type) {
     this.x = x;
     this.start_x = x;
@@ -26,6 +28,9 @@ public abstract class Entity {
     this.w = w;
     this.h = h;
     this.type = type;
+    this.hasGravity = true;
+    
+    // load images for each state
     for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.getImgName());
       PImage[] frames = new PImage[img.width/size];
@@ -34,12 +39,13 @@ public abstract class Entity {
       }
       framesMap.put(s, frames);
     }
-    hasGravity = true;
-    if (Float.isNaN(y)) this.y = height-getImg().height-15;
+    
+    if (Float.isNaN(y)) this.y = height-getImg().height-15; // if no starting y given, start at the bottom of the screen
     else this.y = y-h;
     this.start_y = this.y;
   }
 
+  // create new Entity (platforms and connections use this)
   public Entity(float x, float y, int w, int h, String name, Type type) {
     this.x = x;
     this.start_x = x;
@@ -50,7 +56,9 @@ public abstract class Entity {
     this.w = w;
     this.h = h;
     this.type = type;
-    hasGravity = false;
+    this.hasGravity = false;
+    
+    // load image for each state
     for (State s : getPossibleStates()) {
       PImage img = loadImage(name+"/"+s.getImgName());
       PImage[] frames = new PImage[1];
@@ -59,9 +67,11 @@ public abstract class Entity {
     }
   }
 
+  // move and draw Entity
   public void advance() {
-    frame++;
+    frame++; // advance animations by one frame
 
+    // if chasing player, set velocities based on where the player is
     if (isChasing) {
       vel_x = getRunVel();
       if (player.getX() < x) isRight = false;
@@ -71,11 +81,13 @@ public abstract class Entity {
       else if (player.getY() > y) vel_y = getRunVel();
       else vel_y = 0;
     }
-
+    
+    // move horizontally and vertically
     x += isRight ? vel_x : -vel_x;
     if (hasGravity) vel_y += gravity;
     y += vel_y;
-
+    
+    // collide with platforms
     inAir = true;
     for (Entity e : currentRoom.getPlatforms()) {
       if (checkCollision(e)) {
@@ -83,6 +95,7 @@ public abstract class Entity {
       }
     }
     
+    // if jumping/falling, set state accordingly
     if (inAir && hasGravity) {
       if (type != Type.PLAYER) state = State.JUMP;
       else {
@@ -92,6 +105,7 @@ public abstract class Entity {
       }
     }
     
+    // collide with enemies if player
     if (type == Type.PLAYER) {
       for (Entity e : currentRoom.getEnemies()) {
         if (checkCollision(e)) {
@@ -100,13 +114,15 @@ public abstract class Entity {
       }
     }
 
+    // if past the x boundaries (certain enemies have these), change velocity accordingly
     if (!Float.isNaN(min_x)) {
       if (x < min_x) startVel(true);
     }
     if (!Float.isNaN(max_x)) {
       if (x + w > max_x) startVel(false);
     }
-
+    
+    // draw Entity facing the correct direction
     if (isRight) image(getImg(), x-camera_x, y);
     else {
       pushMatrix();
@@ -116,47 +132,34 @@ public abstract class Entity {
     }
   }
 
+  // get the current image in the animation that the Entity is up to
   public PImage getImg() {
     return framesMap.get(state)[(frame/20)%framesMap.get(state).length];
   }
-  public float getX() {
-    return x;
-  }
-  public float getY() {
-    return y;
-  }
-  public float getWidth() {
-    return w;
-  }
-  public float getHeight() {
-    return h;
-  }
-  public State getState() {
-    return state;
-  }
-  public Type getType() {
-    return type;
-  }
+  
+  // getters
+  public float getX() {return x;}
+  public float getY() {return y;}
+  public float getWidth() {return w;}
+  public float getHeight() {return h;}
+  public State getState() {return state;}
+  public Type getType() {return type;}
 
   public abstract float getRunVel();
   public abstract State[] getPossibleStates();
 
-  public void setGravity(boolean hasGravity) {
-    this.hasGravity = hasGravity;
-  }
-  public void setChasing(boolean chasing) {
-    isChasing = chasing;
-  }
+  // setters
+  public void setGravity(boolean hasGravity) {this.hasGravity = hasGravity;}
+  public void setChasing(boolean chasing) {isChasing = chasing;}
+  public void stopVel() {vel_x = 0;}
 
-  public void stopVel() {
-    vel_x = 0;
-  }
-
+  // run in the direction specified
   public void startVel(boolean right) {
     vel_x = getRunVel();
     isRight = right;
   }
-
+  
+  // reset location within the room
   public void reset() {
     x = start_x;
     y = start_y;
@@ -164,14 +167,16 @@ public abstract class Entity {
     else changeState(State.RUN, false);
   }
 
+  // enter new room
   public void enter(int newID) {
     Connection entrance = rooms[newID].getConnection(currentRoom.getID());
     x = entrance.getX();
-    if (entrance.getX() <= 0) x += entrance.getWidth();
-    else x -= getImg().width;
+    if (entrance.getX() <= 0) x += entrance.getWidth(); // if going forwards
+    else x -= getImg().width; // if going backwards
     y = entrance.getY()+entrance.getHeight()-getImg().height;
   }
 
+  // is current Entity colliding with e?
   public boolean checkCollision(Entity e) {
     if ((x + getImg().width/2.0 - w/2.0 < e.getX()+e.getWidth()) &&
       (x + w > e.getX()) &&
@@ -182,6 +187,7 @@ public abstract class Entity {
     return false;
   }
 
+  // reset the room if damaged
   private void damage() {
     reset();
     for (Entity e : currentRoom.getEnemies()) {
