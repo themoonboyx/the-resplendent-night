@@ -6,6 +6,8 @@ public class Connection extends Entity {
       "connections", Type.BLOCK);
   }
   
+  // doesn't move
   public float getRunVel() {return 0;}
+  
   public State[] getPossibleStates() {return new State[]{State.IDLE};}
 }

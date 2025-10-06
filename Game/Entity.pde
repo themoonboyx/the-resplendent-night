@@ -146,7 +146,7 @@ public abstract class Entity {
   public Type getType() {return type;}
 
   public abstract float getRunVel();
-  public abstract State[] getPossibleStates();
+  public abstract State[] getPossibleStates(); // possible states for images to be loaded for
 
   // setters
   public void setGravity(boolean hasGravity) {this.hasGravity = hasGravity;}
@@ -195,12 +195,13 @@ public abstract class Entity {
     }
   }
 
+  // collide with another Entity e so that they don't overlap
   private void collide(Entity e) {
     y -= vel_y;
-    if (checkCollision(e)) {
+    if (checkCollision(e)) { // if still colliding after resetting y, then it must be a horizontal collision
       y += vel_y;
       x += isRight ? -vel_x : vel_x;
-    } else if (vel_y > 0) {
+    } else if (vel_y > 0) { // otherwise, land on Entity
       y = e.getY() - getImg().height;
       vel_y = 0;
       inAir = false;
@@ -212,10 +213,12 @@ public abstract class Entity {
     }
   }
 
+  // allows changing state when direction doesn't matter
   public void changeState(State newState) {
     changeState(newState, isRight);
   }
 
+  // change the state and direction and change velocities accordingly
   public void changeState(State newState, boolean right) {
     isRight = right;
     switch(newState) {
