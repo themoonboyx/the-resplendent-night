@@ -1,10 +1,12 @@
 public Player player;
 public Room[] rooms;
 public Room currentRoom;
+public Room selectedRoom = null;
 public GameState gameState = GameState.TITLE;
 public HashMap<String, Boolean> isKeyPressed = new HashMap<>(); // keeps track of which keys are being pressed
 public HashMap<GameState, PImage> backgrounds = new HashMap<>();
 public PImage[] level = new PImage[3];
+public PImage[] pausePlay = new PImage[4];
 public float camera_x = 0;
 public float camera_y = 0;
 public float gravity = 0.5;
@@ -32,7 +34,7 @@ public enum State {
 public enum Type {PLAYER, ENEMY, BLOCK};
 
 public enum GameState {
-  TITLE("titleScreen"), SELECT("selectScreen"), PLAYING("background");
+  TITLE("titleScreen"), SELECT("selectScreen"), PLAYING("background"), PAUSE("pauseScreen");
   
   private String imgName;
   
@@ -50,10 +52,15 @@ public void setup() {
     backgrounds.put(gs, loadImage(gs.getImgName()));
   }
   
-  PImage l = loadImage("selectScreen/level.png");
+  PImage l = loadImage("UI/level.png");
   for (int i = 0; i < level.length; i++) {
     level[i] = l.get(i*l.width/level.length, 0, l.width/level.length, l.height);
   }
+  PImage p = loadImage("UI/pausePlay.png");
+  for (int i = 0; i < pausePlay.length; i++) {
+    pausePlay[i] = p.get(i*p.width/pausePlay.length, 0, p.width/pausePlay.length, p.height);
+  }
+  
   player = new Player();
   loadData();
   currentRoom = null;
@@ -77,6 +84,9 @@ public void draw() {
     case PLAYING:
     drawPlaying();
     break;
+    case PAUSE:
+    drawPause();
+    break;
   }
 }
 
@@ -88,21 +98,7 @@ public void drawTitle() {
 public void drawSelect() {
   image(backgrounds.get(GameState.SELECT), 0, 0);
   text("SELECT LEVEL", width/3.0, 50);
-  currentRoom = null;
-  for (int i = 0; i < rooms.length; i++) {
-    float x = ((i%4)+0.5)*width/5.0 + 0.5*(width/5.0-level[0].width);
-    float y = level[0].height*(1+(i/4)*1.25);
-    if (!rooms[i].getIsUnlocked()) image(level[2], x, y);
-    else {
-      if (mouseX >= x && mouseX <= x+level[0].width &&
-      mouseY >= y && mouseY <= y+level[0].height) {
-      currentRoom = rooms[i];
-      image(level[1], x, y);
-      } else image(level[0], x, y);
-    
-      text(i+1, x+0.5*level[0].width-8.0, y+0.5*level[0].height+8.0);
-    }
-  }
+  drawLevels();
 }
 
 public void drawPlaying() {
@@ -125,6 +121,29 @@ public void drawPlaying() {
   currentRoom.advance();
   player.advance(); // draw and move the player
   drawUI();
+}
+
+public void drawPause() {
+  drawLevels();
+  drawUI();
+}
+
+public void drawLevels() {
+  selectedRoom = null;
+  for (int i = 0; i < rooms.length; i++) {
+    float x = ((i%4)+0.5)*width/5.0 + 0.5*(width/5.0-level[0].width);
+    float y = level[0].height*(1+(i/4)*1.25);
+    if (!rooms[i].getIsUnlocked()) image(level[2], x, y);
+    else {
+      if (mouseX >= x && mouseX <= x+level[0].width &&
+      mouseY >= y && mouseY <= y+level[0].height) {
+      selectedRoom = rooms[i];
+      image(level[1], x, y);
+      } else image(level[0], x, y);
+    
+      text(i+1, x+0.5*level[0].width-8.0, y+0.5*level[0].height+8.0);
+    }
+  }
 }
 
 // movement for player based on keyboard
@@ -175,9 +194,23 @@ public void keyReleased() {
 }
 
 public void mouseClicked() {
-  if (gameState != GameState.SELECT || currentRoom == null) return;
-  player.reset();
-  gameState = GameState.PLAYING;
+  if (gameState == GameState.PLAYING || gameState == GameState.PAUSE) {
+    if (mouseX >= 18 && mouseX <= 18+pausePlay[0].width &&
+      mouseY >= 18 && mouseY <= 18+pausePlay[0].height) {
+      if (gameState == GameState.PLAYING) {
+        image(backgrounds.get(GameState.PAUSE), 0, 0);
+        gameState = GameState.PAUSE;
+      } else {
+        gameState = GameState.PLAYING;
+      }
+      return;
+    }
+  }
+  if ((gameState == GameState.PAUSE || gameState == GameState.SELECT) && selectedRoom != null) {
+    currentRoom = selectedRoom;
+    player.reset();
+    gameState = GameState.PLAYING;
+  }
 }
 
 public void loadData() {
@@ -193,6 +226,17 @@ public void loadData() {
 }
 
 public void drawUI() {
+  float x = 18;
+  float y = 18;
+  
+  if (mouseX >= x && mouseX <= x+pausePlay[0].width &&
+      mouseY >= y && mouseY <= y+pausePlay[0].height) {
+      if (gameState == GameState.PLAYING) image(pausePlay[1], x, y);
+      else image(pausePlay[3], x, y);
+  } else {
+    if (gameState == GameState.PLAYING) image(pausePlay[0], x, y);
+    else image(pausePlay[2], x, y);
+  }
 }
 
 public void enterRoom(int newID) {
