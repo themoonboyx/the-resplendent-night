@@ -226,6 +226,12 @@
           "x": 432,
           "y": 180,
           "isRight": false
+        },
+        {
+          "name": "fly",
+          "x": 900,
+          "y": 450,
+          "isRight": false
         }
       ],
       "platforms": [
@@ -285,7 +291,7 @@
         },
         {
           "x": 750,
-          "y": 432,
+          "y": 429,
           "width": 60,
           "height": 60
         },

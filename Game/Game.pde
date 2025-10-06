@@ -209,6 +209,9 @@ public void mouseClicked() {
   if ((gameState == GameState.PAUSE || gameState == GameState.SELECT) && selectedRoom != null) {
     currentRoom = selectedRoom;
     player.reset();
+    for (Entity e : currentRoom.getEnemies()) {
+      e.reset();
+    }
     gameState = GameState.PLAYING;
   }
 }
@@ -243,4 +246,7 @@ public void enterRoom(int newID) {
   player.enter(newID);
   currentRoom = rooms[newID];
   currentRoom.unlock();
+  for (Entity e : currentRoom.getEnemies()) {
+    e.reset();
+  }
 }
